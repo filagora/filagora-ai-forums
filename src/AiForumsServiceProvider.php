@@ -56,15 +56,14 @@ class AiForumsServiceProvider extends ServiceProvider
      */
     private function observeThreadsAndPosts(): void
     {
-        $sync = $this->app->make(ThreadVectorSync::class);
         $thread = Models::class('thread');
         $post = Models::class('post');
 
-        $thread::created(fn ($model) => $sync->threadCreated($model));
-        $thread::saved(fn ($model) => $sync->threadSaved($model));
-        $thread::deleted(fn ($model) => $sync->threadDeleted($model));
-        $post::saved(fn ($model) => $sync->postSaved($model));
-        $post::deleted(fn ($model) => $sync->postDeleted($model));
+        $thread::created(fn ($model) => app(ThreadVectorSync::class)->threadCreated($model));
+        $thread::saved(fn ($model) => app(ThreadVectorSync::class)->threadSaved($model));
+        $thread::deleted(fn ($model) => app(ThreadVectorSync::class)->threadDeleted($model));
+        $post::saved(fn ($model) => app(ThreadVectorSync::class)->postSaved($model));
+        $post::deleted(fn ($model) => app(ThreadVectorSync::class)->postDeleted($model));
     }
 
     /**

@@ -15,6 +15,7 @@ use Filagora\Forums\Services\ForumAccess;
 use Filagora\Forums\Support\Models;
 use Filagora\Search\Search;
 use Filagora\Search\Support\SearchQuery;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -31,11 +32,11 @@ final class ThreadsRetrievalSource implements RetrievalSource
     /** The index is searched for more than is wanted, since some threads are dropped below. */
     private const OVER_FETCH = 3;
 
-    public function __construct(
-        private readonly Search $search,
-        private readonly ForumAccess $access,
-        private readonly ThreadExcerptBuilder $excerpts,
-    ) {}
+    /**
+     * Its collaborators are resolved when it is asked, not when it is registered: it is registered
+     * while the application boots, and `ForumAccess` in particular must not be built that early.
+     */
+    public function __construct(private readonly Container $container) {}
 
     public function key(): string
     {
@@ -48,8 +49,10 @@ final class ThreadsRetrievalSource implements RetrievalSource
             return [];
         }
 
+        $access = $this->container->make(ForumAccess::class);
+        $excerpts = $this->container->make(ThreadExcerptBuilder::class);
         $limit = $query->limitFor($this->key(), ChatRetrieval::defaultLimit());
-        $ids = array_map('intval', $this->search->search(ThreadVectorIndex::NAME, new SearchQuery(vector: $query->vector, perPage: $limit * self::OVER_FETCH))->ids());
+        $ids = array_map('intval', $this->container->make(Search::class)->search(ThreadVectorIndex::NAME, new SearchQuery(vector: $query->vector, perPage: $limit * self::OVER_FETCH))->ids());
 
         if ($ids === []) {
             return [];
@@ -57,7 +60,7 @@ final class ThreadsRetrievalSource implements RetrievalSource
 
         $threads = Models::class('thread')::query()->whereIn('id', $ids)->with('forum')->get()->keyBy('id');
         $excluded = $query->option('exclude_thread_id');
-        $authoredForumIds = $this->access->authoredForumIds($query->user);
+        $authoredForumIds = $access->authoredForumIds($query->user);
         $items = [];
 
         foreach ($ids as $id) {
@@ -73,7 +76,7 @@ final class ThreadsRetrievalSource implements RetrievalSource
                 continue;
             }
 
-            if (! $this->access->canViewForum($forum, $query->user, $authoredForumIds) || ! $this->access->canAccessThread($thread, $query->user)) {
+            if (! $access->canViewForum($forum, $query->user, $authoredForumIds) || ! $access->canAccessThread($thread, $query->user)) {
                 continue;
             }
 
@@ -86,7 +89,7 @@ final class ThreadsRetrievalSource implements RetrievalSource
                 'id' => $thread->getKey(),
                 'title' => $thread->title,
                 'url' => $url,
-                'excerpt' => $this->excerpts->excerpt($thread),
+                'excerpt' => $excerpts->excerpt($thread),
             ];
 
             if (count($items) === $limit) {

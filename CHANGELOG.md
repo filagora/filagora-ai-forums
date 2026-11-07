@@ -5,6 +5,10 @@ All notable changes to this package are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Nothing is built while the application boots: the thread retrieval source resolves the forum access rules when asked, and the thread vector sync when a change happens. Building the access rules at boot broke a host's staff preview.
+
 ### Added
 
 - Thread vectors: the vector-only `thread_vectors` index, kept current as threads and their opening posts change, and `thread-vectors:backfill` and `thread-vectors:status`.
