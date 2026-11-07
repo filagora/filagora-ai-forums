@@ -1,0 +1,10 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+    # The package's own config/ is not the host app's config path; ArchTest guards src/ instead.
+    noEnvCallsOutsideOfConfig: false
+    paths:
+        - src
+        - config

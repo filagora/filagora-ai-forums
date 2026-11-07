@@ -1,0 +1,60 @@
+{
+    "name": "filagora/filagora-ai-forums",
+    "description": "Thread vectors and AI thread assist for filagora-forums: the chat can find earlier threads, and staff can ask for a suggested answer to one.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "filament",
+        "ai",
+        "forum"
+    ],
+    "require": {
+        "php": "^8.4",
+        "filagora/filagora-ai": "^0.1.2",
+        "filagora/filagora-core": "^0.2.2",
+        "filagora/filagora-forums": "^0.6",
+        "filagora/filagora-search": "^0.2.2"
+    },
+    "require-dev": {
+        "filagora/filagora-entitlements": "^0.2.1",
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.0",
+        "orchestra/testbench": "^11.0",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Filagora\\AiForums\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Filagora\\AiForums\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "lint": "vendor/bin/pint",
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=1G"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Filagora\\AiForums\\AiForumsServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "suggest": {
+        "filagora/filagora-entitlements": "Answers the access check from entitlement grants. Without it, bind Filagora\\Core\\Contracts\\AccessChecker."
+    }
+}
