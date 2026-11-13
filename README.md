@@ -9,6 +9,33 @@ touches the forum.
 
 ## What it provides
 
+### Overview
+
+Thread vectors and AI thread assist for filagora-forums: the chat can find earlier threads, and staff can ask for a suggested answer to one.
+
+### Tables
+
+This package adds no tables of its own.
+
+### Commands
+
+| Command | What it does |
+| --- | --- |
+| `thread-vectors:backfill` | Embed answered threads into the thread_vectors index. Repeating it is safe (it overwrites); do not run two at once. |
+| `thread-vectors:status` | Show where the thread_vectors index stands and what to run next. Read-only. |
+
+### Events
+
+This package fires no events.
+
+### Access
+
+| Ability | Entitlement key |
+| --- | --- |
+| `filagora.ai.thread-assist` | `operator.ai.thread_assist` |
+
+### Using it
+
 - **Thread vectors.** One vector per answered thread, from its title and first post, in a vector-only
   search index of its own (`thread_vectors`), kept apart from the keyword index of the same threads.
   A thread is worth a vector when it is approved, in an active forum, and answered. The vector is kept
